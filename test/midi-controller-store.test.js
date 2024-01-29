@@ -26,4 +26,13 @@ describe('midi controller store', () => {
     expect(state.getValue(1, 2)).to.equal(0);
     expect(state.getValue(2, 2)).to.equal(0);
   });
+
+  it('should receive an event when a value is set', () => {
+    const state = MidiControllerStore.getInstance();
+    state.clear();
+    state.on('data', (message) => {
+      expect(message).to.deep.equal({ controller: 1, channel: 10, value: 60 });
+    });
+    state.set(1, 10, 60);
+  });
 });
