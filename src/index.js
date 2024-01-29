@@ -1,8 +1,9 @@
+import EventEmitter from 'node:events';
 import { MidiNormalizer } from 'midi-normalizer';
 
 let instance;
 
-export default class MidiControllerStore {
+export default class MidiControllerStore extends EventEmitter {
   #cache = new Map();
 
   static getInstance() {
@@ -34,9 +35,11 @@ export default class MidiControllerStore {
     if (controller === undefined) throw new Error('controller is undefined');
     if (channel === undefined) throw new Error('channel is undefined');
     if (value === undefined) throw new Error('value is undefined');
+
     const normalizedController = MidiNormalizer.controller(controller);
     const normalizedChannel = MidiNormalizer.channel(channel);
     const normalizedValue = MidiNormalizer.value(value);
+
     this.#cache.set(
       MidiControllerStore.encode(
         normalizedController,
@@ -44,6 +47,13 @@ export default class MidiControllerStore {
       ),
       normalizedValue,
     );
+
+    this.emit('data', {
+      controller: normalizedController,
+      channel: normalizedChannel,
+      value: normalizedValue,
+    });
+
     return this;
   }
 }
